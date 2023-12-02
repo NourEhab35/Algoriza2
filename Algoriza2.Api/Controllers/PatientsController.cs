@@ -1,11 +1,13 @@
 ﻿using Algoriza2.Core.DTOs;
 using Algoriza2.Core.Interfaces;
 using Algoriza2.Core.Models;
+using Algoriza2.EF;
 using Algoriza2.EF.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using static Algoriza2.Core.Enums;
 
 namespace Algoriza2.Api.Controllers
 {
@@ -15,18 +17,22 @@ namespace Algoriza2.Api.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IBaseRepository<Booking> _BookingRepository;
         private readonly IBaseRepository<Doctor> _DoctorRepository;
         private readonly IBaseRepository<Patient> _PatientRepository;
         private readonly DoctorService _DoctorService;
+        private readonly Context _Context;
         public PatientsController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
             IBaseRepository<Patient> patientRepository, IBaseRepository<Doctor> DoctorRepository,
-            DoctorService DoctorService)
+            DoctorService DoctorService, IBaseRepository<Booking> BookingRepository,Context Context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _DoctorRepository = DoctorRepository;
             _PatientRepository = patientRepository;
-            _DoctorService= DoctorService;
+            _DoctorService = DoctorService;
+            _BookingRepository = BookingRepository;
+            _Context= Context;
         }
         [HttpPost]
         [Route("api/[controller]/Registration/[action]")]
@@ -73,18 +79,30 @@ namespace Algoriza2.Api.Controllers
 
 
         [HttpGet]
-        [Route("api/[controller]/Search/Doctors/[action]")]
-        public IActionResult GetAll()
+        [Route("api/[controller]/Search/Doctors/GetAll")]
+        public IActionResult GetAllDoctors()
         {
             var result = _DoctorService.GetDoctors();
             return Ok(result);
         }
-       /* [HttpGet]
-        [Route("api/[controller]/Search/[action]")]
-        public IActionResult GetAll()
+
+        [HttpGet]
+        [Route("api/[controller]/Search/Bookings/[action]")]
+        public IActionResult GetAllBookings(int PatientId)
         {
-            return
-        }*/
+            var result = _BookingRepository.GetAll(x=>x.PatientId==PatientId,null);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("api/[controller]/Cancelation/Bookings/[action]")]
+        public IActionResult Cancel(int id)
+        {
+            var result = _BookingRepository.GetById(id);
+            result.Status = BookingStatus.Canceled;
+            _Context.SaveChanges();
+            return Ok(true);
+        }
 
     }
 }

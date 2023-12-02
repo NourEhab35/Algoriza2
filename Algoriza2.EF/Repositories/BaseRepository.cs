@@ -1,5 +1,6 @@
 ﻿using Algoriza2.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,11 +64,13 @@ namespace Algoriza2.EF.Repositories
         {
             _context.Set<T>().Remove(entity);
         }*/
-      public int Count()
+        public int Count()
         {
             return _context.Set<T>().Count();
         }
+     
 
-       
+
+
     }
 }

@@ -26,17 +26,13 @@ namespace Algoriza2.EF
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<Booking>().HasKey(n => new
-            {
-                n.DoctorId,
-                n.PatientId
-            });
-            builder.Entity<AppointmentTime>().HasKey(n => new
-            {
-                n.FreeDay,
-                n.FreeTime
+            
+            //builder.Entity<AppointmentTime>().HasKey(n => new
+            //{
+            //    n.FreeDay,
+            //    n.FreeTime
 
-            });
+            //});
         }
     }
 }

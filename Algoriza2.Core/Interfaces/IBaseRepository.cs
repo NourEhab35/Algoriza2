@@ -13,11 +13,13 @@ namespace Algoriza2.Core.Interfaces
         T GetById(int id, params Expression<Func<T, object>>[] includes);
         IEnumerable<T> GetAll();
         IEnumerable<T> GetAll(params Expression<Func<T, object>>[] includes);
+
        
         T Add(T entity);
         T Update(T entity);
        // void Delete(int id);
         int Count();
+        
 
     }
     

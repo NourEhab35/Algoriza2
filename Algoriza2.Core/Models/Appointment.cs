@@ -12,7 +12,9 @@ namespace Algoriza2.Core.Models
         public int Id { get; set; }
         public decimal Price { get; set; }
         public bool IsAvailable { get; set; } = true;
-        public List<AppointmentTime>  AppointmentTimes { get; set; } 
+       // public List<AppointmentTime>  AppointmentTimes { get; set; } 
+       public Days Day { get; set; }
+        public int time { get; set; }
 
         public Doctor Doctor { get; set; }
         
