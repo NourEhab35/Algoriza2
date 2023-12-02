@@ -22,7 +22,7 @@ namespace Algoriza2.EF
         DbSet<Booking> Bookings { get; set; }
         DbSet<Appointment> Appointments { get; set; }
         DbSet<DiscountCodeCoupon> DiscountCodes { get; set; }
-        DbSet<AppointmentTime> appointmentTimes { get; set; }
+       DbSet<AppointmentTime> appointmentTimes { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -17,7 +17,7 @@ namespace Algoriza2.EF.Repositories
         }
         public IEnumerable<Doctor> GetDoctors ()
         {
-            return _DoctorRepository.GetAll(b=>b.appointments);
+            return _DoctorRepository.GetAll(x=>x.bookings,x=>x.appointments);
         }
     }
 }

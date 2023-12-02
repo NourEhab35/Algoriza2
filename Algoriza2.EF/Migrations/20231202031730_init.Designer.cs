@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Algoriza2.EF.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20231129161747_AddIdentity")]
-    partial class AddIdentity
+    [Migration("20231202031730_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,201 @@ namespace Algoriza2.EF.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Admin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateOFBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Appointment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.AppointmentTime", b =>
+                {
+                    b.Property<int>("FreeDay")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FreeTime")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FreeDay", "FreeTime");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.ToTable("appointmentTimes");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Booking", b =>
+                {
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Coupon")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("FinalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("DoctorId", "PatientId");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("Coupon")
+                        .IsUnique()
+                        .HasFilter("[Coupon] IS NOT NULL");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.DiscountCodeCoupon", b =>
+                {
+                    b.Property<string>("code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NumOfCompletedBookings")
+                        .HasColumnType("int");
+
+                    b.Property<int>("discountType")
+                        .HasColumnType("int");
+
+                    b.HasKey("code");
+
+                    b.ToTable("DiscountCodes");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Doctor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateOFBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Specialization")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Doctors");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Patient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateOFBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Patients");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -217,6 +412,53 @@ namespace Algoriza2.EF.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Algoriza2.Core.Models.Appointment", b =>
+                {
+                    b.HasOne("Algoriza2.Core.Models.Doctor", "Doctor")
+                        .WithMany("appointments")
+                        .HasForeignKey("DoctorId");
+
+                    b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.AppointmentTime", b =>
+                {
+                    b.HasOne("Algoriza2.Core.Models.Appointment", null)
+                        .WithMany("AppointmentTimes")
+                        .HasForeignKey("AppointmentId");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Booking", b =>
+                {
+                    b.HasOne("Algoriza2.Core.Models.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId");
+
+                    b.HasOne("Algoriza2.Core.Models.DiscountCodeCoupon", "DiscountCodeCoupon")
+                        .WithOne("Booking")
+                        .HasForeignKey("Algoriza2.Core.Models.Booking", "Coupon");
+
+                    b.HasOne("Algoriza2.Core.Models.Doctor", "Doctor")
+                        .WithMany("bookings")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Algoriza2.Core.Models.Patient", "patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("DiscountCodeCoupon");
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("patient");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -266,6 +508,23 @@ namespace Algoriza2.EF.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Appointment", b =>
+                {
+                    b.Navigation("AppointmentTimes");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.DiscountCodeCoupon", b =>
+                {
+                    b.Navigation("Booking");
+                });
+
+            modelBuilder.Entity("Algoriza2.Core.Models.Doctor", b =>
+                {
+                    b.Navigation("appointments");
+
+                    b.Navigation("bookings");
                 });
 #pragma warning restore 612, 618
         }

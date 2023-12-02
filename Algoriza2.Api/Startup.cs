@@ -32,7 +32,8 @@ namespace Algoriza2.Api
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(
+                x=>x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddSwaggerGen(c =>
             {
@@ -43,6 +44,7 @@ namespace Algoriza2.Api
             , b => b.MigrationsAssembly(typeof(Context).Assembly.FullName)));
 
             services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddTransient<DoctorService>();
 
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<Context>();
             //services.Configure<IdentityOptions>(options =>

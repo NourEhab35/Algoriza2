@@ -10,6 +10,7 @@ namespace Algoriza2.Core.Interfaces
     public interface IBaseRepository<T> where T : class 
     {
         T GetById(int id);
+        T GetById(int id, params Expression<Func<T, object>>[] includes);
         IEnumerable<T> GetAll();
         IEnumerable<T> GetAll(params Expression<Func<T, object>>[] includes);
        
