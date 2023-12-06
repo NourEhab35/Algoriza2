@@ -10,15 +10,15 @@ namespace Algoriza2.Core.Models
 {
     public class DiscountCodeCoupon
     {
-        [Key]
-        public string code { set; get; }
+        public int Id { get; set; }
+        public string Code { set; get; }
 
         public bool IsActive { set; get; }
         public int NumOfCompletedBookings { set; get; }
-        public DiscountType discountType { set; get; }
+        public DiscountType DiscountType { set; get; }
 
-        public int Value;
+        public int Value { get; set; }
 
-        public Booking Booking { set; get; }
+        public List<Booking> Bookings { set; get; }
     }
 }

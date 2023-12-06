@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Algoriza2.EF.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20231202031730_init")]
+    [Migration("20231203193506_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,14 +61,14 @@ namespace Algoriza2.EF.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DoctorId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -79,35 +79,39 @@ namespace Algoriza2.EF.Migrations
 
             modelBuilder.Entity("Algoriza2.Core.Models.AppointmentTime", b =>
                 {
-                    b.Property<int>("FreeDay")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FreeTime")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("AppointmentId")
                         .HasColumnType("int");
 
-                    b.HasKey("FreeDay", "FreeTime");
+                    b.Property<int>("FreeTime")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("AppointmentId");
 
-                    b.ToTable("appointmentTimes");
+                    b.ToTable("AppointmentTimes");
                 });
 
             modelBuilder.Entity("Algoriza2.Core.Models.Booking", b =>
                 {
-                    b.Property<int>("DoctorId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AppointmentTimeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PatientId")
+                    b.Property<int?>("DiscountCodeCouponId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AppointmentId")
+                    b.Property<int?>("DoctorId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Coupon")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("FinalPrice")
                         .HasColumnType("decimal(18,2)");
@@ -115,23 +119,35 @@ namespace Algoriza2.EF.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.HasKey("DoctorId", "PatientId");
+                    b.Property<int?>("patientId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("AppointmentId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Coupon")
-                        .IsUnique()
-                        .HasFilter("[Coupon] IS NOT NULL");
+                    b.HasIndex("AppointmentTimeId")
+                        .IsUnique();
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("DiscountCodeCouponId");
+
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("patientId");
 
                     b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Algoriza2.Core.Models.DiscountCodeCoupon", b =>
                 {
-                    b.Property<string>("code")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -139,12 +155,9 @@ namespace Algoriza2.EF.Migrations
                     b.Property<int>("NumOfCompletedBookings")
                         .HasColumnType("int");
 
-                    b.Property<int>("discountType")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("code");
-
-                    b.ToTable("DiscountCodes");
+                    b.ToTable("DiscountCodeCoupons");
                 });
 
             modelBuilder.Entity("Algoriza2.Core.Models.Doctor", b =>
@@ -174,6 +187,9 @@ namespace Algoriza2.EF.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<string>("Specialization")
                         .HasColumnType("nvarchar(max)");
@@ -415,7 +431,7 @@ namespace Algoriza2.EF.Migrations
             modelBuilder.Entity("Algoriza2.Core.Models.Appointment", b =>
                 {
                     b.HasOne("Algoriza2.Core.Models.Doctor", "Doctor")
-                        .WithMany("appointments")
+                        .WithMany("Appointments")
                         .HasForeignKey("DoctorId");
 
                     b.Navigation("Doctor");
@@ -423,34 +439,34 @@ namespace Algoriza2.EF.Migrations
 
             modelBuilder.Entity("Algoriza2.Core.Models.AppointmentTime", b =>
                 {
-                    b.HasOne("Algoriza2.Core.Models.Appointment", null)
-                        .WithMany("AppointmentTimes")
-                        .HasForeignKey("AppointmentId");
-                });
-
-            modelBuilder.Entity("Algoriza2.Core.Models.Booking", b =>
-                {
                     b.HasOne("Algoriza2.Core.Models.Appointment", "Appointment")
                         .WithMany()
                         .HasForeignKey("AppointmentId");
 
-                    b.HasOne("Algoriza2.Core.Models.DiscountCodeCoupon", "DiscountCodeCoupon")
-                        .WithOne("Booking")
-                        .HasForeignKey("Algoriza2.Core.Models.Booking", "Coupon");
+                    b.Navigation("Appointment");
+                });
 
-                    b.HasOne("Algoriza2.Core.Models.Doctor", "Doctor")
-                        .WithMany("bookings")
-                        .HasForeignKey("DoctorId")
+            modelBuilder.Entity("Algoriza2.Core.Models.Booking", b =>
+                {
+                    b.HasOne("Algoriza2.Core.Models.AppointmentTime", "AppointmentTime")
+                        .WithOne("Booking")
+                        .HasForeignKey("Algoriza2.Core.Models.Booking", "AppointmentTimeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Algoriza2.Core.Models.DiscountCodeCoupon", "DiscountCodeCoupon")
+                        .WithMany("Bookings")
+                        .HasForeignKey("DiscountCodeCouponId");
+
+                    b.HasOne("Algoriza2.Core.Models.Doctor", "Doctor")
+                        .WithMany("Bookings")
+                        .HasForeignKey("DoctorId");
 
                     b.HasOne("Algoriza2.Core.Models.Patient", "patient")
                         .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("patientId");
 
-                    b.Navigation("Appointment");
+                    b.Navigation("AppointmentTime");
 
                     b.Navigation("DiscountCodeCoupon");
 
@@ -510,21 +526,21 @@ namespace Algoriza2.EF.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Algoriza2.Core.Models.Appointment", b =>
-                {
-                    b.Navigation("AppointmentTimes");
-                });
-
-            modelBuilder.Entity("Algoriza2.Core.Models.DiscountCodeCoupon", b =>
+            modelBuilder.Entity("Algoriza2.Core.Models.AppointmentTime", b =>
                 {
                     b.Navigation("Booking");
                 });
 
+            modelBuilder.Entity("Algoriza2.Core.Models.DiscountCodeCoupon", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
             modelBuilder.Entity("Algoriza2.Core.Models.Doctor", b =>
                 {
-                    b.Navigation("appointments");
+                    b.Navigation("Appointments");
 
-                    b.Navigation("bookings");
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

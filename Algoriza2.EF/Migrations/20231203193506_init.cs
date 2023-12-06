@@ -66,17 +66,19 @@ namespace Algoriza2.EF.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DiscountCodes",
+                name: "DiscountCodeCoupons",
                 columns: table => new
                 {
-                    code = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     NumOfCompletedBookings = table.Column<int>(type: "int", nullable: false),
-                    discountType = table.Column<int>(type: "int", nullable: false)
+                    DiscountType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DiscountCodes", x => x.code);
+                    table.PrimaryKey("PK_DiscountCodeCoupons", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,6 +88,7 @@ namespace Algoriza2.EF.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Specialization = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<int>(type: "int", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -136,7 +139,7 @@ namespace Algoriza2.EF.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -157,7 +160,7 @@ namespace Algoriza2.EF.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -177,7 +180,7 @@ namespace Algoriza2.EF.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -195,13 +198,13 @@ namespace Algoriza2.EF.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -221,7 +224,7 @@ namespace Algoriza2.EF.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -230,8 +233,8 @@ namespace Algoriza2.EF.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false),
+                    Day = table.Column<int>(type: "int", nullable: false),
                     DoctorId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -242,66 +245,69 @@ namespace Algoriza2.EF.Migrations
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "appointmentTimes",
+                name: "AppointmentTimes",
                 columns: table => new
                 {
-                    FreeDay = table.Column<int>(type: "int", nullable: false),
-                    FreeTime = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FreeTime = table.Column<int>(type: "int", nullable: false),
                     AppointmentId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_appointmentTimes", x => new { x.FreeDay, x.FreeTime });
+                    table.PrimaryKey("PK_AppointmentTimes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_appointmentTimes_Appointments_AppointmentId",
+                        name: "FK_AppointmentTimes_Appointments_AppointmentId",
                         column: x => x.AppointmentId,
                         principalTable: "Appointments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Bookings",
                 columns: table => new
                 {
-                    DoctorId = table.Column<int>(type: "int", nullable: false),
-                    PatientId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Status = table.Column<int>(type: "int", nullable: false),
                     FinalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AppointmentId = table.Column<int>(type: "int", nullable: true),
-                    Coupon = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    DoctorId = table.Column<int>(type: "int", nullable: true),
+                    patientId = table.Column<int>(type: "int", nullable: true),
+                    AppointmentTimeId = table.Column<int>(type: "int", nullable: false),
+                    DiscountCodeCouponId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Bookings", x => new { x.DoctorId, x.PatientId });
+                    table.PrimaryKey("PK_Bookings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Bookings_Appointments_AppointmentId",
-                        column: x => x.AppointmentId,
-                        principalTable: "Appointments",
+                        name: "FK_Bookings_AppointmentTimes_AppointmentTimeId",
+                        column: x => x.AppointmentTimeId,
+                        principalTable: "AppointmentTimes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Bookings_DiscountCodes_Coupon",
-                        column: x => x.Coupon,
-                        principalTable: "DiscountCodes",
-                        principalColumn: "code",
-                        onDelete: ReferentialAction.NoAction);
+                        name: "FK_Bookings_DiscountCodeCoupons_DiscountCodeCouponId",
+                        column: x => x.DiscountCodeCouponId,
+                        principalTable: "DiscountCodeCoupons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Bookings_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Bookings_Patients_PatientId",
-                        column: x => x.PatientId,
+                        name: "FK_Bookings_Patients_patientId",
+                        column: x => x.patientId,
                         principalTable: "Patients",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -310,8 +316,8 @@ namespace Algoriza2.EF.Migrations
                 column: "DoctorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_appointmentTimes_AppointmentId",
-                table: "appointmentTimes",
+                name: "IX_AppointmentTimes_AppointmentId",
+                table: "AppointmentTimes",
                 column: "AppointmentId");
 
             migrationBuilder.CreateIndex(
@@ -354,30 +360,31 @@ namespace Algoriza2.EF.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_AppointmentId",
+                name: "IX_Bookings_AppointmentTimeId",
                 table: "Bookings",
-                column: "AppointmentId");
+                column: "AppointmentTimeId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_Coupon",
+                name: "IX_Bookings_DiscountCodeCouponId",
                 table: "Bookings",
-                column: "Coupon",
-                unique: true,
-                filter: "[Coupon] IS NOT NULL");
+                column: "DiscountCodeCouponId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_PatientId",
+                name: "IX_Bookings_DoctorId",
                 table: "Bookings",
-                column: "PatientId");
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_patientId",
+                table: "Bookings",
+                column: "patientId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "Admins");
-
-            migrationBuilder.DropTable(
-                name: "appointmentTimes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -404,13 +411,16 @@ namespace Algoriza2.EF.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Appointments");
+                name: "AppointmentTimes");
 
             migrationBuilder.DropTable(
-                name: "DiscountCodes");
+                name: "DiscountCodeCoupons");
 
             migrationBuilder.DropTable(
                 name: "Patients");
+
+            migrationBuilder.DropTable(
+                name: "Appointments");
 
             migrationBuilder.DropTable(
                 name: "Doctors");

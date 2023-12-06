@@ -12,16 +12,21 @@ namespace Algoriza2.EF.Repositories
     {
         private readonly IBaseRepository<Patient> _patientRepository;
         private readonly IBaseRepository<Booking> _BookingRepository;
-        public PatientService(IBaseRepository<Patient> PatientRepository, IBaseRepository<Booking> BookingRepository)
+        private readonly IBaseRepository<Doctor> _DoctorRepository;
+        private readonly Context _Context;
+        public PatientService(IBaseRepository<Patient> PatientRepository, IBaseRepository<Booking> BookingRepository,
+            IBaseRepository<Doctor> DoctorRepository, Context Context)
         {
             _patientRepository = PatientRepository;
             _BookingRepository = BookingRepository;
+            _DoctorRepository = DoctorRepository;
+            _Context = Context;
         }
-        public IEnumerable<Booking> GetBookings(int id)
-        { 
-            var result = _BookingRepository.GetAll(x=>x.PatientId==id);
-            return result;
-        }
+        //public IEnumerable<Booking> GetBookings(int id)
+        //{ 
+        //    var result = _BookingRepository.GetAll(x=>x.PatientId==id);
+        //    return result;
+        //}
 
 
 

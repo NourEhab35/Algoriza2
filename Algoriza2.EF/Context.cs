@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Algoriza2.EF
 {
-    public class Context:IdentityDbContext
+    public class Context : IdentityDbContext
 
     {
-        public Context(DbContextOptions<Context>options):base(options)
+        public Context(DbContextOptions<Context> options) : base(options)
         {
         }
 
@@ -21,18 +21,13 @@ namespace Algoriza2.EF
         DbSet<Admin> Admins { get; set; }
         DbSet<Booking> Bookings { get; set; }
         DbSet<Appointment> Appointments { get; set; }
-        DbSet<DiscountCodeCoupon> DiscountCodes { get; set; }
-       DbSet<AppointmentTime> appointmentTimes { get; set; }
+        DbSet<DiscountCodeCoupon> DiscountCodeCoupons { get; set; }
+        DbSet<AppointmentTime> AppointmentTimes { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            
-            //builder.Entity<AppointmentTime>().HasKey(n => new
-            //{
-            //    n.FreeDay,
-            //    n.FreeTime
 
-            //});
+            
         }
     }
 }
