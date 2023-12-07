@@ -11,7 +11,7 @@ namespace Algoriza2.Core.Models
 {
     public class Patient:Person
     {
-     public ICollection<Booking> bookings;
+     public ICollection<Booking> Bookings;
 
 
     }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -23,20 +24,32 @@ namespace Algoriza2.Api.Controllers
         private readonly IBaseRepository<Booking> _BookingRepository;
         private readonly IBaseRepository<Doctor> _DoctorRepository;
         private readonly IBaseRepository<Patient> _PatientRepository;
+        private readonly IBaseRepository<AppointmentTime> _AppointmentTimeRepository;
+        private readonly IBaseRepository<DiscountCodeCoupon> _DiscountCodeCouponRepository;
         private readonly DoctorService _DoctorService;
+        private readonly BookingService _BookingService;
         private readonly Context _Context;
         public PatientsController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
             IBaseRepository<Patient> patientRepository, IBaseRepository<Doctor> DoctorRepository,
-            DoctorService DoctorService, IBaseRepository<Booking> BookingRepository, Context Context)
+            DoctorService DoctorService, BookingService BookingService, IBaseRepository<Booking> BookingRepository,
+            IBaseRepository<AppointmentTime> AppointmentTimeRepository,
+            IBaseRepository<DiscountCodeCoupon> DiscountCodeCouponRepository,
+            Context Context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _DoctorRepository = DoctorRepository;
             _PatientRepository = patientRepository;
             _DoctorService = DoctorService;
+            _BookingService = BookingService;
             _BookingRepository = BookingRepository;
+            _AppointmentTimeRepository = AppointmentTimeRepository;
+            _DiscountCodeCouponRepository = DiscountCodeCouponRepository;
             _Context = Context;
         }
+
+
+
 
         [HttpPost]
         [Route("api/[controller]/Registration/[action]")]
@@ -95,30 +108,109 @@ namespace Algoriza2.Api.Controllers
 
         [HttpGet]
         [Route("api/[controller]/Search/Doctors/GetAll")]
-        public IActionResult GetAllDoctors(int Page, int PageSize)
+
+        //Search is optional
+        public IActionResult GetAllDoctors(int Page, int PageSize, string Search)
         {
-            var result = _DoctorService.GetDoctorsForPatient(Page, PageSize);
+            var result = _DoctorService.GetDoctorsForPatient(Page, PageSize, Search);
             return Ok(result);
         }
 
-        //[HttpGet]
-        //[Route("api/[controller]/Search/Bookings/GetAll")]
-        //public IActionResult GetAllBookings(int PatientId)
-        //{
-        //    var result = _DoctorService.GetBooking(PatientId);
 
-        //    return Ok(result);
-        //}
+
+        [HttpPost]
+        [Route("api/[controller]/Booking/Add")]
+        public IActionResult AddBooking(int PatientId, int TimeId, string Coupon)
+        {
+
+            Booking booking = new Booking();
+            var appointmentTime = _Context.Set<AppointmentTime>()
+                .Include(x => x.Appointment)
+                .SingleOrDefault(x => x.Id == TimeId);
+            if (appointmentTime == null)
+            {
+                return BadRequest("Invalid appointment time.");
+            }
+
+            int doctorId = appointmentTime.Appointment.DoctorId;
+            var doctor = _DoctorRepository.GetById(doctorId);
+
+            DiscountCodeCoupon discountCodeCoupon = null;
+            if (Coupon != null)
+            {
+                discountCodeCoupon = _DiscountCodeCouponRepository.Find(x => x.Code == Coupon);
+            }
+
+            booking.Status = BookingStatus.Pending;
+            booking.AppointmentTimeId = TimeId;
+            booking.DoctorId = doctorId;
+            booking.PatientId = PatientId;
+
+            var numberOfCompletedBookings = _Context.Set<Booking>()
+                .Where(x => x.PatientId == PatientId && x.Status == BookingStatus.Completed).Count();
+
+
+            if (discountCodeCoupon != null && discountCodeCoupon.IsActive == true && discountCodeCoupon.NumOfCompletedBookings <= numberOfCompletedBookings)
+            {
+                booking.DiscountCodeCouponId = discountCodeCoupon.Id;
+
+                if (discountCodeCoupon.DiscountType == DiscountType.Value)
+                {
+                    if (discountCodeCoupon.Value <= doctor.Price)
+                    {
+                        booking.FinalPrice = doctor.Price - discountCodeCoupon.Value;
+                    }
+                    else
+                    {
+                        booking.FinalPrice = 0;
+                    }
+                }
+                else if (discountCodeCoupon.DiscountType == DiscountType.Percentage)
+                {
+                    var actualValue = (doctor.Price * discountCodeCoupon.Value) / 100;
+                    booking.FinalPrice = doctor.Price - actualValue;
+
+                }
+            }
+            else
+            {
+                booking.DiscountCodeCouponId = null;
+                booking.FinalPrice = doctor.Price;
+            }
+            _BookingRepository.Add(booking);
+
+
+            return Ok();
+        }
+
+
 
         [HttpGet]
+        [Route("api/[controller]/Search/Bookings/GetAll")]
+        public IActionResult GetAllBookings(int PatientId)
+        {
+            var result = _BookingService.GetAllBookingForPatient(PatientId);
+            return Ok(result);
+        }
+
+
+
+        [HttpPost]
         [Route("api/[controller]/Cancelation/Bookings/[action]")]
         public IActionResult Cancel(int id)
         {
-            var result = _Context.Set<Booking>().Include(x=>x.AppointmentTime).FirstOrDefault(x => x.Id == id);
-            result.Status = BookingStatus.Canceled;
-            result.AppointmentTime.IsAvailable = true;
-            _Context.SaveChanges();
-            return Ok(true);
+            var result = _Context.Set<Booking>().FirstOrDefault(x => x.Id == id);
+            if (result.Status == BookingStatus.Pending)
+            {
+                result.Status = BookingStatus.Canceled;
+                _Context.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
         }
 
     }

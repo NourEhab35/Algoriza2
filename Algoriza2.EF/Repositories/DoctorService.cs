@@ -32,12 +32,29 @@ namespace Algoriza2.EF.Repositories
                 .Take(PageSize);
             return DoctorsPerPage;
         }
-        public IEnumerable<DoctorBasicInfo> GetDoctorsForPatient(int Page, int PageSize)
+
+
+
+        public IEnumerable<DoctorBasicInfo> GetDoctorsForPatient(int Page, int PageSize, string search)
         {
             var DoctorsWithAppointmentsAndTimes = _context.Set<Doctor>()
-                .Include(x => x.Appointments);
-            // ThenInclude(x => x.AppointmentTime).ToList();
-            var DoctorsPerPage = DoctorsWithAppointmentsAndTimes
+                .Include(x => x.Appointments).Include(x => x.Bookings).ToList();
+
+            IEnumerable<Doctor> SearchApplied = null;
+            IEnumerable<DoctorBasicInfo> DoctorsPerPage = null;
+
+            if (search != null)
+            {
+
+                SearchApplied = DoctorsWithAppointmentsAndTimes
+                     .Where(x => x.Email.Contains(search)
+                     || x.FirstName.Contains(search)
+                     || x.LastName.Contains(search)
+                     || x.Specialization.Contains(search)
+                     || x.PhoneNumber.Contains(search));
+
+
+                DoctorsPerPage = SearchApplied
                 .Select(x => new DoctorBasicInfo
                 {
                     FullName = $"{x.FirstName} {x.LastName}",
@@ -46,25 +63,40 @@ namespace Algoriza2.EF.Repositories
                     Specialization = x.Specialization,
                     Price = x.Price,
                     Gender = x.Gender,
-                    Appointments = x.Appointments,
-                    AppointmentTimes = _context.Set<AppointmentTime>().Where(at=>at.Appointment.Doctor.Id == x.Id && at.IsAvailable==true).ToList()
+                    //Appointments = x.Appointments,
+                    AppointmentTimes = _context.Set<AppointmentTime>().Where(at => at.Appointment.Doctor.Id == x.Id && at.IsAvailable == true).ToList()
                 }).ToList()
                   .Skip((Page - 1) * PageSize)
                   .Take(PageSize).ToList();
-            return DoctorsPerPage;
+
+            }
+            else
+            {
+                DoctorsPerPage = DoctorsWithAppointmentsAndTimes
+                .Select(x => new DoctorBasicInfo
+                {
+                    FullName = $"{x.FirstName} {x.LastName}",
+                    Email = x.Email,
+                    Phone = x.PhoneNumber,
+                    Specialization = x.Specialization,
+                    Price = x.Price,
+                    Gender = x.Gender,
+                    //Appointments = x.Appointments,
+                    AppointmentTimes = _context.Set<AppointmentTime>().Where(at => at.Appointment.Doctor.Id == x.Id && at.IsAvailable == true).ToList()
+                }).ToList()
+                  .Skip((Page - 1) * PageSize)
+                  .Take(PageSize).ToList();
+}
+
+
+
+
+return DoctorsPerPage;
         }
 
     }
 
   
-
-
-    //public IEnumerable<Booking> GetBooking(int id)
-    //{
-    //    var result = _context.Set<Booking>().Where(x => x.PatientId == id).Include(d => d.Doctor.FirstName);
-
-    //    return result;
-    //}
 
 }
 

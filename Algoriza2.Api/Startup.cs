@@ -45,7 +45,8 @@ namespace Algoriza2.Api
 
             services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddTransient<DoctorService>();
-            services.AddTransient<BookingService>();   
+            services.AddTransient<BookingService>();
+            
 
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<Context>();
             //services.Configure<IdentityOptions>(options =>
