@@ -7,7 +7,7 @@ using static Algoriza2.Core.Enums;
 
 namespace Algoriza2.Core.DTOs
 {
-    public class BookingInfoForPatient
+    public class BookingInfoDTO
     {
         public string DoctorName { get; set; }
         public string Specialization { get; set; }

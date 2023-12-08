@@ -7,7 +7,7 @@ using static Algoriza2.Core.Enums;
 
 namespace Algoriza2.Core.DTOs
 {
-    public class AddAppointmentModel
+    public class AddAppointmentDTO
     {
         public int DoctorId { get; set; }
         public List<Days> Days { get; set; }

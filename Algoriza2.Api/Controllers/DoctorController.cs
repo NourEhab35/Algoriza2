@@ -97,7 +97,7 @@ namespace Algoriza2.Api.Controllers
 
         [HttpPost]
         [Route("api/[controller]/Appointment/Add")]
-        public IActionResult AddAppointment([FromBody] AddAppointmentModel addAppointmentModel)
+        public IActionResult AddAppointment([FromBody] AddAppointmentDTO addAppointmentModel)
         {
             foreach (var day in addAppointmentModel.Days)
             {

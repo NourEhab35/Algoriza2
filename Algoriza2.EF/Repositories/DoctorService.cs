@@ -46,8 +46,7 @@ namespace Algoriza2.EF.Repositories
             if (search != null)
             {
 
-                SearchApplied = DoctorsWithAppointmentsAndTimes
-                     .Where(x => x.Email.Contains(search)
+                SearchApplied = DoctorsWithAppointmentsAndTimes.Where(x => x.Email.Contains(search)
                      || x.FirstName.Contains(search)
                      || x.LastName.Contains(search)
                      || x.Specialization.Contains(search)
@@ -86,17 +85,13 @@ namespace Algoriza2.EF.Repositories
                 }).ToList()
                   .Skip((Page - 1) * PageSize)
                   .Take(PageSize).ToList();
-}
-
-
-
-
-return DoctorsPerPage;
+            }
+            return DoctorsPerPage;
         }
 
     }
 
-  
+
 
 }
 

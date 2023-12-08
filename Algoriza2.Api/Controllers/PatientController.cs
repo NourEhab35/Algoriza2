@@ -108,7 +108,6 @@ namespace Algoriza2.Api.Controllers
 
         [HttpGet]
         [Route("api/[controller]/Search/Doctors/GetAll")]
-
         //Search is optional
         public IActionResult GetAllDoctors(int Page, int PageSize, string Search)
         {

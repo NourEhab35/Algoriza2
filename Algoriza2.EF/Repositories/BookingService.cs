@@ -44,7 +44,7 @@ namespace Algoriza2.EF.Repositories
             return NumOfCanceledBookings;
         }
 
-        public IEnumerable<BookingInfoForPatient> GetAllBookingsForPatient(int PatientId) 
+        public IEnumerable<BookingInfoDTO> GetAllBookingsForPatient(int PatientId) 
         {
             var bookingsForPatient = _context.Set<Booking>()
                 .Include(x=>x.Doctor)
@@ -52,7 +52,7 @@ namespace Algoriza2.EF.Repositories
                 .Include(x=>x.AppointmentTime)
                 .ThenInclude(x=>x.Appointment)
                 .Where(x=>x.PatientId == PatientId);
-            var selected = bookingsForPatient.Select(x => new BookingInfoForPatient
+            var selected = bookingsForPatient.Select(x => new BookingInfoDTO
             {
                 DoctorName = $"{x.Doctor.FirstName} {x.Doctor.LastName}",
                 Specialization = x.Doctor.Specialization,

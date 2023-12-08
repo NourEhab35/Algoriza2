@@ -30,7 +30,8 @@ namespace Algoriza2.Api.Controllers
         private readonly Context _Context;
         public AdminController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
             IBaseRepository<Patient> patientRepository, IBaseRepository<Doctor> DoctorRepository, IBaseRepository<Booking> BookingRepository,
-            IBaseRepository<DiscountCodeCoupon> DiscountCodeCouponRepository ,DoctorService DoctorService, BookingService BookingService, Context Context)
+            IBaseRepository<DiscountCodeCoupon> DiscountCodeCouponRepository ,DoctorService DoctorService, BookingService BookingService,
+            PatientService PatientService ,Context Context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -39,6 +40,7 @@ namespace Algoriza2.Api.Controllers
             _BookingRepository = BookingRepository;
             _DiscountCodeCouponRepository = DiscountCodeCouponRepository;
             _DoctorService = DoctorService;
+            _PatientService = PatientService;
             _BookingService = BookingService;
             _Context = Context;
 
@@ -118,9 +120,30 @@ namespace Algoriza2.Api.Controllers
         //    return Ok(result);
         //}
 
+        [HttpGet]
+        [Route("api/[controller]/Patients/GetAll")]
+        //Search is optional
+        public IActionResult GetAllPatients(int Page , int PageSize , string Search) 
+        {
+            var result = _PatientService.GetAllPatientsForAdmin(Page, PageSize, Search);
+            return Ok(result);
+        }
+
+
+
+
+        [HttpGet]
+        [Route("api/[controller]/Patient/GetById")]
+        public IActionResult GetPatientById(int PatientId) 
+        {
+            var Patient =_PatientService.GetPatientByIdForAdmin(PatientId);
+            return Ok(Patient);
+        }
+
+
         [HttpPost]
         [Route("api/[controller]/DiscountCodeCoupon/Add")]
-        public IActionResult AddDiscountCodeCoupon( AddDiscountCodeCouponModel discountCodeCouponModel)
+        public IActionResult AddDiscountCodeCoupon( AddDiscountCodeCouponDTO discountCodeCouponModel)
         {
 
             DiscountCodeCoupon NewDiscountCodeCoupon= new DiscountCodeCoupon();
