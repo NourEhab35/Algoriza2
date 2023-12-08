@@ -20,7 +20,7 @@ namespace Algoriza2.Core.Interfaces
 
         T Add(T entity);
         T Update(T entity);
-        // void Delete(int id);
+         void Delete(T entity);
         int Count();
 
 

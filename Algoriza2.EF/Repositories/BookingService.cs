@@ -44,14 +44,15 @@ namespace Algoriza2.EF.Repositories
             return NumOfCanceledBookings;
         }
 
-        public IEnumerable<BookingInfo> GetAllBookingForPatient(int PatientId) 
+        public IEnumerable<BookingInfoForPatient> GetAllBookingsForPatient(int PatientId) 
         {
             var bookingsForPatient = _context.Set<Booking>()
                 .Include(x=>x.Doctor)
                 .Include(x=>x.DiscountCodeCoupon)
                 .Include(x=>x.AppointmentTime)
-                .ThenInclude(x=>x.Appointment).Where(x=>x.PatientId == PatientId);
-            var selected = bookingsForPatient.Select(x => new BookingInfo
+                .ThenInclude(x=>x.Appointment)
+                .Where(x=>x.PatientId == PatientId);
+            var selected = bookingsForPatient.Select(x => new BookingInfoForPatient
             {
                 DoctorName = $"{x.Doctor.FirstName} {x.Doctor.LastName}",
                 Specialization = x.Doctor.Specialization,
@@ -65,5 +66,28 @@ namespace Algoriza2.EF.Repositories
             });
             return selected;
         }
+
+        public IEnumerable<BookingInfoForDoctor> GetAllBookingsForDoctor(int DoctorId)
+        {
+            var bookingForDoctor = _context.Set<Booking>()
+                .Include(x => x.patient)
+                .Include(x => x.AppointmentTime)
+                .ThenInclude(x => x.Appointment)
+                .Where(x => x.DoctorId == DoctorId);
+            var selectedBookings = bookingForDoctor.Select(x => new BookingInfoForDoctor
+            {
+                PatientName=$"{x.patient.FirstName} {x.patient.LastName}",
+                Gender=x.patient.Gender,
+                Phone = x.patient.PhoneNumber,
+                Email =x.patient.Email,
+                Day = x.AppointmentTime.Appointment.Day,
+                Time = x.AppointmentTime.FreeTime
+            });
+            return selectedBookings;
+        }
+
+
+
+
     }
 }

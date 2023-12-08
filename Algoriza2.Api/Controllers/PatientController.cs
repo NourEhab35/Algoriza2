@@ -17,7 +17,7 @@ namespace Algoriza2.Api.Controllers
 {
 
     [ApiController]
-    public class PatientsController : ControllerBase
+    public class PatientController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -29,7 +29,7 @@ namespace Algoriza2.Api.Controllers
         private readonly DoctorService _DoctorService;
         private readonly BookingService _BookingService;
         private readonly Context _Context;
-        public PatientsController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
+        public PatientController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
             IBaseRepository<Patient> patientRepository, IBaseRepository<Doctor> DoctorRepository,
             DoctorService DoctorService, BookingService BookingService, IBaseRepository<Booking> BookingRepository,
             IBaseRepository<AppointmentTime> AppointmentTimeRepository,
@@ -52,7 +52,7 @@ namespace Algoriza2.Api.Controllers
 
 
         [HttpPost]
-        [Route("api/[controller]/Registration/[action]")]
+        [Route("api/[controller]/[action]")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
 
@@ -86,7 +86,7 @@ namespace Algoriza2.Api.Controllers
 
 
         [HttpPost]
-        [Route("api/[controller]/Login/[action]")]
+        [Route("api/[controller]/[action]")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)
@@ -189,14 +189,14 @@ namespace Algoriza2.Api.Controllers
         [Route("api/[controller]/Search/Bookings/GetAll")]
         public IActionResult GetAllBookings(int PatientId)
         {
-            var result = _BookingService.GetAllBookingForPatient(PatientId);
+            var result = _BookingService.GetAllBookingsForPatient(PatientId);
             return Ok(result);
         }
 
 
 
         [HttpPost]
-        [Route("api/[controller]/Cancelation/Bookings/[action]")]
+        [Route("api/[controller]/Cancelation/Booking/[action]")]
         public IActionResult Cancel(int id)
         {
             var result = _Context.Set<Booking>().FirstOrDefault(x => x.Id == id);

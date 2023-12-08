@@ -14,6 +14,7 @@ namespace Algoriza2.Core.Models
         public int FreeTime { get; set; }
 
         public bool IsAvailable { get; set; }
+        public int AppointmentId { get; set; }
         public Appointment Appointment { get; set; }
         
         public Booking Booking { get; set; }

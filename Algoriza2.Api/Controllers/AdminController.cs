@@ -16,26 +16,28 @@ namespace Algoriza2.Api.Controllers
 {
 
     [ApiController]
-    public class AdminsController : ControllerBase
+    public class AdminController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IBaseRepository<Doctor> _DoctorRepository;
         private readonly IBaseRepository<Patient> _PatientRepository;
         private readonly IBaseRepository<Booking> _BookingRepository;
+        private readonly IBaseRepository<DiscountCodeCoupon> _DiscountCodeCouponRepository;
         private readonly DoctorService _DoctorService;
         private readonly PatientService _PatientService;
         private readonly BookingService _BookingService;
         private readonly Context _Context;
-        public AdminsController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
+        public AdminController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
             IBaseRepository<Patient> patientRepository, IBaseRepository<Doctor> DoctorRepository, IBaseRepository<Booking> BookingRepository,
-            DoctorService DoctorService, BookingService BookingService, Context Context)
+            IBaseRepository<DiscountCodeCoupon> DiscountCodeCouponRepository ,DoctorService DoctorService, BookingService BookingService, Context Context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _PatientRepository = patientRepository;
             _DoctorRepository = DoctorRepository;
             _BookingRepository = BookingRepository;
+            _DiscountCodeCouponRepository = DiscountCodeCouponRepository;
             _DoctorService = DoctorService;
             _BookingService = BookingService;
             _Context = Context;
@@ -116,6 +118,75 @@ namespace Algoriza2.Api.Controllers
         //    return Ok(result);
         //}
 
+        [HttpPost]
+        [Route("api/[controller]/DiscountCodeCoupon/Add")]
+        public IActionResult AddDiscountCodeCoupon( AddDiscountCodeCouponModel discountCodeCouponModel)
+        {
+
+            DiscountCodeCoupon NewDiscountCodeCoupon= new DiscountCodeCoupon();
+            NewDiscountCodeCoupon.Code = discountCodeCouponModel.Code;
+            NewDiscountCodeCoupon.IsActive = discountCodeCouponModel.IsActive;
+            NewDiscountCodeCoupon.NumOfCompletedBookings = discountCodeCouponModel.NumOfCompletedBookings;
+            NewDiscountCodeCoupon.DiscountType = discountCodeCouponModel.DiscountType;
+            NewDiscountCodeCoupon.Value = discountCodeCouponModel.Value;
+            _DiscountCodeCouponRepository.Add(NewDiscountCodeCoupon);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/[controller]/DiscountCodeCoupon/Update")]
+        public IActionResult UpdateDiscountCodeCoupon(UpdateDiscountCodeCouponModel discountCodeCouponModel)
+        {
+            var discountCodeCoupon = _DiscountCodeCouponRepository.GetById(discountCodeCouponModel.Id);
+            if (discountCodeCoupon == null)
+            {
+                return BadRequest("Invalid Discount Code Coupon ID");
+            }
+            var Bookings=_BookingRepository.Find(x=>x.DiscountCodeCouponId == discountCodeCoupon.Id);
+            if (Bookings != null)
+            {
+                return BadRequest("Used discount code coupon can not be updated");
+            }
+            discountCodeCoupon.Code=discountCodeCouponModel.Code;
+            discountCodeCoupon.NumOfCompletedBookings = discountCodeCouponModel.NumOfCompletedBookings;
+            discountCodeCoupon.DiscountType=discountCodeCouponModel.DiscountType;
+            discountCodeCoupon.Value = discountCodeCouponModel.Value;
+            _Context.SaveChanges();
+
+            return Ok();
+        }
+
+
+            [HttpPost]
+        [Route("api/[controller]/DiscountCodeCoupon/Delete")]
+        public IActionResult DeleteDiscountCodeCoupon(int DiscountCodeCouponId)
+        {
+            var discountCodeCoupon = _DiscountCodeCouponRepository.GetById(DiscountCodeCouponId);
+            if (discountCodeCoupon == null)
+            {
+                return BadRequest("Invalid Discount Code Coupon ID");
+            }
+            _DiscountCodeCouponRepository.Delete(discountCodeCoupon);
+
+            return Ok();
+        }
+
+
+
+            [HttpPost]
+        [Route("api/[controller]/DiscountCodeCoupon/Deactivate")]
+        public IActionResult DeactivateDiscountCodeCoupon(int DiscountCodeCouponId)
+        {
+            var discountCodeCoupon = _DiscountCodeCouponRepository.GetById(DiscountCodeCouponId);
+            if (discountCodeCoupon == null)
+            {
+                return BadRequest("Invalid Discount Code Coupon ID");
+            }
+            discountCodeCoupon.IsActive = false;
+            _Context.SaveChanges();
+            return Ok();
+        }
 
 
     }

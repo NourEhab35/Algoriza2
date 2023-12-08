@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Algoriza2.Core.Models
 {
-    public class Doctor : Person
+    public class Doctor : ApplicationUser
     {
         public string Specialization { set; get; }
         public int Price { set; get; }

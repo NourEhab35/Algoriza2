@@ -69,12 +69,14 @@ namespace Algoriza2.EF.Repositories
         public T Update(T item)
         {
             _context.Set<T>().Update(item);
+            _context.SaveChanges();
             return item;
         }
-        /*  public void Delete(T entity) 
-          {
-              _context.Set<T>().Remove(entity);
-          }*/
+        public void Delete(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+            _context.SaveChanges();
+        }
         public int Count()
         {
             return _context.Set<T>().Count();

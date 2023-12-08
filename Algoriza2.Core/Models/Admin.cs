@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Algoriza2.Core.Models
 {
-    public class Admin : Person
+    public class Admin : ApplicationUser
     {
     }
 }
