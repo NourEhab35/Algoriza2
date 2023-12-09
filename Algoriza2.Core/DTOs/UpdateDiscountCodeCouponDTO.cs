@@ -7,7 +7,7 @@ using static Algoriza2.Core.Enums;
 
 namespace Algoriza2.Core.DTOs
 {
-    public class UpdateDiscountCodeCouponModel
+    public class UpdateDiscountCodeCouponDTO
     {
         public int Id { get; set; }
         public string Code { set; get; }

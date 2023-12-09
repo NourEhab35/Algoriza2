@@ -67,14 +67,14 @@ namespace Algoriza2.EF.Repositories
             return selected;
         }
 
-        public IEnumerable<BookingInfoForDoctor> GetAllBookingsForDoctor(int DoctorId)
+        public IEnumerable<BookingInfoForDoctorDTO> GetAllBookingsForDoctor(int DoctorId)
         {
             var bookingForDoctor = _context.Set<Booking>()
                 .Include(x => x.patient)
                 .Include(x => x.AppointmentTime)
                 .ThenInclude(x => x.Appointment)
                 .Where(x => x.DoctorId == DoctorId);
-            var selectedBookings = bookingForDoctor.Select(x => new BookingInfoForDoctor
+            var selectedBookings = bookingForDoctor.Select(x => new BookingInfoForDoctorDTO
             {
                 PatientName=$"{x.patient.FirstName} {x.patient.LastName}",
                 Gender=x.patient.Gender,

@@ -76,7 +76,7 @@ namespace Algoriza2.EF.Repositories
         public GetPatientByIdForAdminDTO GetPatientByIdForAdmin (int patientId)
         {
 
-            var bookings = _BookingService.GetAllBookingsForPatient(patientId).ToList() ;
+            var bookings = _BookingService.GetAllBookingsForPatient(patientId).ToList();
             var PatientById= _Context.Set<Patient>()
                 .Where(x=>x.Id == patientId)
                 .Select(x=> new GetPatientByIdForAdminDTO

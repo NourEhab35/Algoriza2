@@ -53,7 +53,7 @@ namespace Algoriza2.Api.Controllers
 
         [HttpPost]
         [Route("api/[controller]/[action]")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO model)
         {
 
             if (!ModelState.IsValid)
@@ -87,7 +87,7 @@ namespace Algoriza2.Api.Controllers
 
         [HttpPost]
         [Route("api/[controller]/[action]")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -111,7 +111,7 @@ namespace Algoriza2.Api.Controllers
         //Search is optional
         public IActionResult GetAllDoctors(int Page, int PageSize, string Search)
         {
-            var result = _DoctorService.GetDoctorsForPatient(Page, PageSize, Search);
+            var result = _DoctorService.GetAllDoctorsForPatient(Page, PageSize, Search);
             return Ok(result);
         }
 

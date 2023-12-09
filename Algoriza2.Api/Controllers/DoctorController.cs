@@ -49,7 +49,7 @@ namespace Algoriza2.Api.Controllers
 
         [HttpPost]
         [Route("api/[controller]/[action]")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -155,6 +155,20 @@ namespace Algoriza2.Api.Controllers
                 return BadRequest("Booked Time Can not be deleted");
             }
             _AppointmentTimeRepository.Delete(AppointmentTime);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/[controller]/Price/Add")]
+        public IActionResult AddPrice(int DoctorId , int Price)
+        {
+            var doctor = _DoctorRepository.GetById(DoctorId);
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+            doctor.Price = Price;
+            _Context.SaveChanges();
             return Ok();
         }
 

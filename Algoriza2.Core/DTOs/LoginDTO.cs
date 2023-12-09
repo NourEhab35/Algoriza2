@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Algoriza2.Core.DTOs
 {
-    public class LoginModel
+    public class LoginDTO
     {
         [Required]
         [EmailAddress]

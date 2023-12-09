@@ -24,37 +24,77 @@ namespace Algoriza2.EF.Repositories
             _AppointmentTimeRepository = AppointmentTimeRepository;
             _context = context;
         }
-        public IEnumerable<Doctor> GetDoctorsForAdmin(int Page, int PageSize)
+        public IEnumerable<GetAllDoctorsForAdminDTO> GetAllDoctorsForAdmin(int Page, int PageSize, string Search)
         {
+            var AllDoctors = _context.Set<Doctor>().ToList();
 
-            var DoctorsPerPage = _DoctorRepository.GetAll()
-                .Skip((Page - 1) * PageSize)
-                .Take(PageSize);
+
+            IEnumerable<Doctor> SearchApplied = null;
+            IEnumerable<GetAllDoctorsForAdminDTO> DoctorsPerPage = null;
+            if (Search != null)
+            {
+
+                SearchApplied = AllDoctors.Where(x => x.Email.Contains(Search)
+                     || x.FirstName.Contains(Search)
+                     || x.LastName.Contains(Search)
+                     || x.Specialization.Contains(Search)
+                     || x.PhoneNumber.Contains(Search));
+
+                DoctorsPerPage = SearchApplied
+                    .Select(x => new GetAllDoctorsForAdminDTO
+                    {
+                        FullName = $"{x.FirstName} {x.LastName}",
+                        Email = x.Email,
+                        PhoneNumber = x.PhoneNumber,
+                        Specialization = x.Specialization,
+                        Gender = x.Gender,
+
+                    }).ToList()
+                      .Skip((Page - 1) * PageSize)
+                      .Take(PageSize).ToList();
+            }
+            else
+            {
+                DoctorsPerPage = AllDoctors
+                        .Select(x => new GetAllDoctorsForAdminDTO
+                        {
+                            FullName = $"{x.FirstName} {x.LastName}",
+                            Email = x.Email,
+                            PhoneNumber = x.PhoneNumber,
+                            Specialization = x.Specialization,
+                            Gender = x.Gender,
+
+                        }).ToList()
+                      .Skip((Page - 1) * PageSize)
+                      .Take(PageSize).ToList();
+            }
+
+
             return DoctorsPerPage;
         }
 
 
 
-        public IEnumerable<DoctorBasicInfo> GetDoctorsForPatient(int Page, int PageSize, string search)
+        public IEnumerable<GetAllDoctorsForPatientDTO> GetAllDoctorsForPatient(int Page, int PageSize, string Search)
         {
-            var DoctorsWithAppointmentsAndTimes = _context.Set<Doctor>()
+            var AllDoctorsWithAppointmentsAndTimes = _context.Set<Doctor>()
                 .Include(x => x.Appointments).Include(x => x.Bookings).ToList();
 
             IEnumerable<Doctor> SearchApplied = null;
-            IEnumerable<DoctorBasicInfo> DoctorsPerPage = null;
+            IEnumerable<GetAllDoctorsForPatientDTO> DoctorsPerPage = null;
 
-            if (search != null)
+            if (Search != null)
             {
 
-                SearchApplied = DoctorsWithAppointmentsAndTimes.Where(x => x.Email.Contains(search)
-                     || x.FirstName.Contains(search)
-                     || x.LastName.Contains(search)
-                     || x.Specialization.Contains(search)
-                     || x.PhoneNumber.Contains(search));
+                SearchApplied = AllDoctorsWithAppointmentsAndTimes.Where(x => x.Email.Contains(Search)
+                     || x.FirstName.Contains(Search)
+                     || x.LastName.Contains(Search)
+                     || x.Specialization.Contains(Search)
+                     || x.PhoneNumber.Contains(Search));
 
 
                 DoctorsPerPage = SearchApplied
-                .Select(x => new DoctorBasicInfo
+                .Select(x => new GetAllDoctorsForPatientDTO
                 {
                     FullName = $"{x.FirstName} {x.LastName}",
                     Email = x.Email,
@@ -71,8 +111,8 @@ namespace Algoriza2.EF.Repositories
             }
             else
             {
-                DoctorsPerPage = DoctorsWithAppointmentsAndTimes
-                .Select(x => new DoctorBasicInfo
+                DoctorsPerPage = AllDoctorsWithAppointmentsAndTimes
+                .Select(x => new GetAllDoctorsForPatientDTO
                 {
                     FullName = $"{x.FirstName} {x.LastName}",
                     Email = x.Email,
@@ -87,6 +127,22 @@ namespace Algoriza2.EF.Repositories
                   .Take(PageSize).ToList();
             }
             return DoctorsPerPage;
+        }
+
+        public GetDoctorByIdForAdminDTO GetDoctorByIdForAdmin(int DoctorId)
+        {
+            var DoctorById = _context.Set<Doctor>()
+                .Where(x => x.Id == DoctorId)
+                .Select(x => new GetDoctorByIdForAdminDTO
+                {
+                    FullName = $"{x.FirstName} {x.LastName}",
+                    Email = x.Email,
+                    PhoneNumber = x.PhoneNumber,
+                    Specialization = x.Specialization,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOFBirth
+                }).FirstOrDefault();
+            return DoctorById;
         }
 
     }

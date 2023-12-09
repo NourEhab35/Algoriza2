@@ -8,7 +8,7 @@ using static Algoriza2.Core.Enums;
 
 namespace Algoriza2.Core.DTOs
 {
-    public class RegisterModel
+    public class RegisterDTO
     {
         [Required]
         [EmailAddress]
