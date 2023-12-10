@@ -158,6 +158,7 @@ namespace Algoriza2.Api.Controllers
             doctor.Gender = model.Gender;
             doctor.DateOFBirth = model.DateOfBirth;
             _DoctorRepository.Add(doctor);
+            await _userManager.AddToRoleAsync(user, "Doctor");
             return Ok();
         }
 

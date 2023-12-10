@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 using static Algoriza2.Core.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Algoriza2.Api.Controllers
 {
-
+    [Authorize(Roles = "Doctor")]
     [ApiController]
     public class DoctorController : ControllerBase
     {
@@ -45,7 +46,7 @@ namespace Algoriza2.Api.Controllers
             _Context = Context;
         }
 
-
+        [AllowAnonymous]
         [HttpPost]
         [Route("api/[controller]/[action]")]
         public async Task<IActionResult> Login([FromBody] LoginDTO model)
@@ -103,7 +104,7 @@ namespace Algoriza2.Api.Controllers
             }
             foreach (var day in addAppointmentModel.Days)
             {
-              
+
                 Appointment NewAppointment = new Appointment();
                 NewAppointment.DoctorId = addAppointmentModel.DoctorId;
                 NewAppointment.Day = day;
@@ -114,7 +115,7 @@ namespace Algoriza2.Api.Controllers
                     {
                         return BadRequest("Invalid time, Enter time between 0 and 23");
                     }
-                        int AppointmentId = _Context.Set<Appointment>().OrderByDescending(x => x.Id).FirstOrDefault().Id;
+                    int AppointmentId = _Context.Set<Appointment>().OrderByDescending(x => x.Id).FirstOrDefault().Id;
                     AppointmentTime NewAppointmentTime = new AppointmentTime();
                     NewAppointmentTime.FreeTime = time;
                     NewAppointmentTime.IsAvailable = true;

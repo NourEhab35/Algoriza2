@@ -1,6 +1,8 @@
 using Algoriza2.Core.Interfaces;
+using Algoriza2.Core.Settings;
 using Algoriza2.EF;
 using Algoriza2.EF.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,10 +13,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Algoriza2.Api
@@ -47,6 +51,8 @@ namespace Algoriza2.Api
             services.AddTransient<DoctorService>();
             services.AddTransient<BookingService>();
             services.AddTransient<PatientService>();
+            services.AddTransient<IMailingService,MailingService>();
+
 
 
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<Context>();
@@ -58,7 +64,7 @@ namespace Algoriza2.Api
                 options.Password.RequireLowercase = true;
                 options.Password.RequireDigit = true;
             });
-            services.AddAutoMapper(typeof(Startup));
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

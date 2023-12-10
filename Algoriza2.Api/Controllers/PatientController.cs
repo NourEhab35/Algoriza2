@@ -3,6 +3,7 @@ using Algoriza2.Core.Interfaces;
 using Algoriza2.Core.Models;
 using Algoriza2.EF;
 using Algoriza2.EF.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ using static Algoriza2.Core.Enums;
 
 namespace Algoriza2.Api.Controllers
 {
-
+    [Authorize(Roles = "Patient")]
     [ApiController]
     public class PatientController : ControllerBase
     {
@@ -50,7 +51,7 @@ namespace Algoriza2.Api.Controllers
 
 
 
-
+        [AllowAnonymous]
         [HttpPost]
         [Route("api/[controller]/[action]")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO model)
@@ -77,10 +78,11 @@ namespace Algoriza2.Api.Controllers
             patient.Gender = model.Gender;
             patient.DateOFBirth = model.DateOfBirth;
             _PatientRepository.Add(patient);
+            await _userManager.AddToRoleAsync(user, "Patient");
             return Ok();
         }
 
-
+        [AllowAnonymous]
         [HttpPost]
         [Route("api/[controller]/[action]")]
         public async Task<IActionResult> Login([FromBody] LoginDTO model)
