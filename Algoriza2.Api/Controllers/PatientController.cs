@@ -55,7 +55,6 @@ namespace Algoriza2.Api.Controllers
         [Route("api/[controller]/[action]")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO model)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -63,7 +62,6 @@ namespace Algoriza2.Api.Controllers
 
             var user = new IdentityUser { UserName = model.Email, Email = model.Email };
             var Result = await _userManager.CreateAsync(user, model.Password);
-
 
             if (!Result.Succeeded)
             {
@@ -80,9 +78,7 @@ namespace Algoriza2.Api.Controllers
             patient.DateOFBirth = model.DateOfBirth;
             _PatientRepository.Add(patient);
             return Ok();
-
         }
-
 
 
         [HttpPost]
@@ -101,21 +97,16 @@ namespace Algoriza2.Api.Controllers
                 return Unauthorized(model);
             }
             return Accepted();
-
-
         }
 
 
         [HttpGet]
         [Route("api/[controller]/Search/Doctors/GetAll")]
-        //Search is optional
-        public IActionResult GetAllDoctors(int Page, int PageSize, string Search)
+        public IActionResult GetAllDoctors(int PageNumber, int PageSize, string Search) //Search is optional
         {
-            var result = _DoctorService.GetAllDoctorsForPatient(Page, PageSize, Search);
-            return Ok(result);
+            var Doctors = _DoctorService.GetAllDoctorsForPatient(PageNumber, PageSize, Search);
+            return Ok(Doctors);
         }
-
-
 
         [HttpPost]
         [Route("api/[controller]/Booking/Add")]
@@ -149,7 +140,7 @@ namespace Algoriza2.Api.Controllers
                 .Where(x => x.PatientId == PatientId && x.Status == BookingStatus.Completed).Count();
 
 
-            if (discountCodeCoupon != null && discountCodeCoupon.IsActive == true && discountCodeCoupon.NumOfCompletedBookings <= numberOfCompletedBookings)
+            if (discountCodeCoupon != null && discountCodeCoupon.IsActive == true && discountCodeCoupon.NumberOfCompletedBookings <= numberOfCompletedBookings)
             {
                 booking.DiscountCodeCouponId = discountCodeCoupon.Id;
 
@@ -183,25 +174,23 @@ namespace Algoriza2.Api.Controllers
         }
 
 
-
         [HttpGet]
         [Route("api/[controller]/Search/Bookings/GetAll")]
         public IActionResult GetAllBookings(int PatientId)
         {
-            var result = _BookingService.GetAllBookingsForPatient(PatientId);
-            return Ok(result);
+            var Bookings = _BookingService.GetAllBookingsForPatient(PatientId);
+            return Ok(Bookings);
         }
 
 
-
         [HttpPost]
-        [Route("api/[controller]/Cancelation/Booking/[action]")]
+        [Route("api/[controller]/Cancelation/Booking/Cancel")]
         public IActionResult Cancel(int id)
         {
-            var result = _Context.Set<Booking>().FirstOrDefault(x => x.Id == id);
-            if (result.Status == BookingStatus.Pending)
+            var Booking = _Context.Set<Booking>().FirstOrDefault(x => x.Id == id);
+            if (Booking.Status == BookingStatus.Pending)
             {
-                result.Status = BookingStatus.Canceled;
+                Booking.Status = BookingStatus.Canceled;
                 _Context.SaveChanges();
                 return Ok();
             }
@@ -209,8 +198,6 @@ namespace Algoriza2.Api.Controllers
             {
                 return BadRequest();
             }
-
         }
-
     }
 }

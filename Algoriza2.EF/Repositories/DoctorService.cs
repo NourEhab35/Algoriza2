@@ -24,7 +24,7 @@ namespace Algoriza2.EF.Repositories
             _AppointmentTimeRepository = AppointmentTimeRepository;
             _context = context;
         }
-        public IEnumerable<GetAllDoctorsForAdminDTO> GetAllDoctorsForAdmin(int Page, int PageSize, string Search)
+        public IEnumerable<GetAllDoctorsForAdminDTO> GetAllDoctorsForAdmin(int PageNumber, int PageSize, string Search)
         {
             var AllDoctors = _context.Set<Doctor>().ToList();
 
@@ -50,7 +50,7 @@ namespace Algoriza2.EF.Repositories
                         Gender = x.Gender,
 
                     }).ToList()
-                      .Skip((Page - 1) * PageSize)
+                      .Skip((PageNumber - 1) * PageSize)
                       .Take(PageSize).ToList();
             }
             else
@@ -65,7 +65,7 @@ namespace Algoriza2.EF.Repositories
                             Gender = x.Gender,
 
                         }).ToList()
-                      .Skip((Page - 1) * PageSize)
+                      .Skip((PageNumber - 1) * PageSize)
                       .Take(PageSize).ToList();
             }
 
@@ -75,7 +75,7 @@ namespace Algoriza2.EF.Repositories
 
 
 
-        public IEnumerable<GetAllDoctorsForPatientDTO> GetAllDoctorsForPatient(int Page, int PageSize, string Search)
+        public IEnumerable<GetAllDoctorsForPatientDTO> GetAllDoctorsForPatient(int PageNumber, int PageSize, string Search)
         {
             var AllDoctorsWithAppointmentsAndTimes = _context.Set<Doctor>()
                 .Include(x => x.Appointments).Include(x => x.Bookings).ToList();
@@ -102,10 +102,9 @@ namespace Algoriza2.EF.Repositories
                     Specialization = x.Specialization,
                     Price = x.Price,
                     Gender = x.Gender,
-                    //Appointments = x.Appointments,
                     AppointmentTimes = _context.Set<AppointmentTime>().Where(at => at.Appointment.Doctor.Id == x.Id && at.IsAvailable == true).ToList()
                 }).ToList()
-                  .Skip((Page - 1) * PageSize)
+                  .Skip((PageNumber - 1) * PageSize)
                   .Take(PageSize).ToList();
 
             }
@@ -120,10 +119,9 @@ namespace Algoriza2.EF.Repositories
                     Specialization = x.Specialization,
                     Price = x.Price,
                     Gender = x.Gender,
-                    //Appointments = x.Appointments,
                     AppointmentTimes = _context.Set<AppointmentTime>().Where(at => at.Appointment.Doctor.Id == x.Id && at.IsAvailable == true).ToList()
                 }).ToList()
-                  .Skip((Page - 1) * PageSize)
+                  .Skip((PageNumber - 1) * PageSize)
                   .Take(PageSize).ToList();
             }
             return DoctorsPerPage;
@@ -146,8 +144,5 @@ namespace Algoriza2.EF.Repositories
         }
 
     }
-
-
-
 }
 

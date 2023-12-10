@@ -13,7 +13,7 @@ namespace Algoriza2.Core.DTOs
         [EmailAddress]
         public string Email { get; set; }
         [Required]
-        [DataType(DataType.Password)]   
+        [DataType(DataType.Password)]
         public string Password { get; set; }
     }
 }

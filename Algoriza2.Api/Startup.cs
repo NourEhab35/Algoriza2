@@ -47,17 +47,17 @@ namespace Algoriza2.Api
             services.AddTransient<DoctorService>();
             services.AddTransient<BookingService>();
             services.AddTransient<PatientService>();
-            
+
 
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<Context>();
-            //services.Configure<IdentityOptions>(options =>
-            //{
-            //    options.Password.RequiredLength = 5;
-            //    options.Password.RequiredUniqueChars = 1;
-            //    options.Password.RequireUppercase = true;
-            //    options.Password.RequireLowercase = true;
-            //    options.Password.RequireDigit = true;
-            //});
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequiredUniqueChars = 3;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireDigit = true;
+            });
             services.AddAutoMapper(typeof(Startup));
         }
 

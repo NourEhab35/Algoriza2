@@ -8,7 +8,7 @@ namespace Algoriza2.Core
 {
     public class Enums
     {
-       public enum Gender
+        public enum Gender
         {
             Female,
             Male

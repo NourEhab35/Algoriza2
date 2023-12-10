@@ -30,7 +30,7 @@ namespace Algoriza2.Api.Controllers
         public DoctorController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
             IBaseRepository<Patient> patientRepository, IBaseRepository<Doctor> DoctorRepository,
             DoctorService DoctorService, BookingService BookingService, IBaseRepository<Booking> BookingRepository,
-            IBaseRepository<AppointmentTime> AppointmentTimeRepository,IBaseRepository<Appointment> AppointmentRepository,
+            IBaseRepository<AppointmentTime> AppointmentTimeRepository, IBaseRepository<Appointment> AppointmentRepository,
             Context Context)
         {
             _userManager = userManager;
@@ -44,7 +44,6 @@ namespace Algoriza2.Api.Controllers
             _AppointmentRepository = AppointmentRepository;
             _Context = Context;
         }
-
 
 
         [HttpPost]
@@ -63,8 +62,6 @@ namespace Algoriza2.Api.Controllers
                 return Unauthorized(model);
             }
             return Accepted();
-
-
         }
 
 
@@ -72,8 +69,8 @@ namespace Algoriza2.Api.Controllers
         [Route("api/[controller]/Bookings/GetAll")]
         public IActionResult GetAllBookings(int DoctorId)
         {
-            var result=_BookingService.GetAllBookingsForDoctor(DoctorId);
-            return Ok(result);
+            var bookings = _BookingService.GetAllBookingsForDoctor(DoctorId);
+            return Ok(bookings);
         }
 
 
@@ -82,7 +79,7 @@ namespace Algoriza2.Api.Controllers
         public IActionResult ConfirmCheckUp(int BookingId)
         {
             var Booking = _BookingRepository.GetById(BookingId);
-            if (Booking != null && Booking.Status==BookingStatus.Pending)
+            if (Booking != null && Booking.Status == BookingStatus.Pending)
             {
                 Booking.Status = BookingStatus.Completed;
                 _Context.SaveChanges();
@@ -99,24 +96,32 @@ namespace Algoriza2.Api.Controllers
         [Route("api/[controller]/Appointment/Add")]
         public IActionResult AddAppointment([FromBody] AddAppointmentDTO addAppointmentModel)
         {
+            var doctor = _DoctorRepository.GetById(addAppointmentModel.DoctorId);
+            if (doctor == null)
+            {
+                return BadRequest("Invalid doctor ID");
+            }
             foreach (var day in addAppointmentModel.Days)
             {
+              
                 Appointment NewAppointment = new Appointment();
                 NewAppointment.DoctorId = addAppointmentModel.DoctorId;
-                NewAppointment.Day= day;
+                NewAppointment.Day = day;
                 _AppointmentRepository.Add(NewAppointment);
-                foreach(var time in addAppointmentModel.Times)
+                foreach (var time in addAppointmentModel.Times)
                 {
-                    int AppointmentId= _Context.Set<Appointment>().OrderByDescending(x => x.Id).FirstOrDefault().Id;
+                    if (time > 23 || time < 0)
+                    {
+                        return BadRequest("Invalid time, Enter time between 0 and 23");
+                    }
+                        int AppointmentId = _Context.Set<Appointment>().OrderByDescending(x => x.Id).FirstOrDefault().Id;
                     AppointmentTime NewAppointmentTime = new AppointmentTime();
                     NewAppointmentTime.FreeTime = time;
                     NewAppointmentTime.IsAvailable = true;
 
                     NewAppointmentTime.AppointmentId = AppointmentId;
                     _AppointmentTimeRepository.Add(NewAppointmentTime);
-
                 }
-
             }
             return Ok();
         }
@@ -160,7 +165,7 @@ namespace Algoriza2.Api.Controllers
 
         [HttpPost]
         [Route("api/[controller]/Price/Add")]
-        public IActionResult AddPrice(int DoctorId , int Price)
+        public IActionResult AddPrice(int DoctorId, int Price)
         {
             var doctor = _DoctorRepository.GetById(DoctorId);
             if (doctor == null)
@@ -171,8 +176,5 @@ namespace Algoriza2.Api.Controllers
             _Context.SaveChanges();
             return Ok();
         }
-
-
-
     }
 }

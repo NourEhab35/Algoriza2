@@ -33,7 +33,7 @@ namespace Algoriza2.Api.Controllers
         public AdminController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
             IBaseRepository<Patient> patientRepository, IBaseRepository<Doctor> DoctorRepository, IBaseRepository<Booking> BookingRepository,
             IBaseRepository<DiscountCodeCoupon> DiscountCodeCouponRepository,
-            IBaseRepository<Appointment> AppointmentRepository,IBaseRepository<AppointmentTime>AppointmentTimeRepository,DoctorService DoctorService, BookingService BookingService,
+            IBaseRepository<Appointment> AppointmentRepository, IBaseRepository<AppointmentTime> AppointmentTimeRepository, DoctorService DoctorService, BookingService BookingService,
             PatientService PatientService, Context Context)
         {
             _userManager = userManager;
@@ -52,28 +52,27 @@ namespace Algoriza2.Api.Controllers
         }
         [HttpGet]
         [Route("api/[controller]/Dashboard/[action]")]
-        public int NumOfDoctors()
+        public int NumberOfDoctors()
         {
             return _DoctorRepository.Count();
-
         }
 
         [HttpGet]
         [Route("api/[controller]/Dashboard/[action]")]
-        public int NumOfPatients()
+        public int NumberOfPatients()
         {
             return _PatientRepository.Count();
         }
 
         [HttpGet]
         [Route("api/[controller]/Dashboard/[action]")]
-        public IActionResult NumOfBookings()
+        public IActionResult NumberOfBookings()
         {
             NumberOfBookingsDTO numberOfBookingsDTO = new NumberOfBookingsDTO();
-            numberOfBookingsDTO.NumberOfBookings = _BookingService.NumOfBookings();
-            numberOfBookingsDTO.NumberOfPendingBookings = _BookingService.NumOfPendingBookings();
-            numberOfBookingsDTO.NumberOfCompletedBookings = _BookingService.NumOfCompletedBookings();
-            numberOfBookingsDTO.NumberOfCanceledBookings = _BookingService.NumOfCanceledBookings();
+            numberOfBookingsDTO.NumberOfBookings = _BookingService.NumberOfBookings();
+            numberOfBookingsDTO.NumberOfPendingBookings = _BookingService.NumberOfPendingBookings();
+            numberOfBookingsDTO.NumberOfCompletedBookings = _BookingService.NumberOfCompletedBookings();
+            numberOfBookingsDTO.NumberOfCanceledBookings = _BookingService.NumberOfCanceledBookings();
             return Ok(numberOfBookingsDTO);
 
         }
@@ -84,13 +83,13 @@ namespace Algoriza2.Api.Controllers
         {
             var top5Specializations = _Context.Set<Doctor>().Include(x => x.Bookings).ToList()
 
-        .GroupBy(d => d.Specialization)
-        .Select(g => new SpecializationBookingDTO
+        .GroupBy(g => g.Specialization)
+        .Select(s => new SpecializationBookingDTO
         {
-            SpecializationName = g.Key,
-            NumberOfBookings = g.Sum(d => d.Bookings.Count)
+            SpecializationName = s.Key,
+            NumberOfBookings = s.Sum(c => c.Bookings.Count)
         })
-        .OrderByDescending(dto => dto.NumberOfBookings)
+        .OrderByDescending(x => x.NumberOfBookings)
         .Take(5)
         .ToList();
 
@@ -110,7 +109,7 @@ namespace Algoriza2.Api.Controllers
                     Specialization = d.Specialization,
                     NumberOfBookings = d.Bookings.Count
                 })
-                .OrderByDescending(dto => dto.NumberOfBookings)
+                .OrderByDescending(o => o.NumberOfBookings)
                 .Take(10);
 
             return Ok(top10Doctors);
@@ -119,9 +118,9 @@ namespace Algoriza2.Api.Controllers
 
         [HttpGet]
         [Route("api/[controller]/Doctors/GetAll")]
-        public IActionResult GetAllDoctors(int Page, int PageSize, string Search)
+        public IActionResult GetAllDoctors(int PageNumber, int PageSize, string Search)
         {
-            var Doctors = _DoctorService.GetAllDoctorsForAdmin(Page, PageSize, Search);
+            var Doctors = _DoctorService.GetAllDoctorsForAdmin(PageNumber, PageSize, Search);
             return Ok(Doctors);
         }
 
@@ -138,7 +137,6 @@ namespace Algoriza2.Api.Controllers
         [Route("api/[controller]/Doctor/Add")]
         public async Task<IActionResult> AddDoctor([FromBody] AddDoctorDTO model)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -168,7 +166,7 @@ namespace Algoriza2.Api.Controllers
         public async Task<IActionResult> UpdateDoctor([FromBody] UpdateDoctorDTO model)
         {
             var doctor = _DoctorRepository.GetById(model.Id);
-            if(doctor == null)
+            if (doctor == null)
             {
                 return BadRequest();
             }
@@ -179,8 +177,8 @@ namespace Algoriza2.Api.Controllers
             doctor.PhoneNumber = model.PhoneNumber;
             doctor.Specialization = model.Specialization;
             doctor.Gender = model.Gender;
-            doctor.DateOFBirth= model.DateOfBirth;
-            user.Email= model.Email;
+            doctor.DateOFBirth = model.DateOfBirth;
+            user.Email = model.Email;
             user.UserName = model.Email;
             await _userManager.UpdateAsync(user);
             _Context.SaveChanges();
@@ -190,40 +188,40 @@ namespace Algoriza2.Api.Controllers
         }
 
 
-            [HttpPost]
+        [HttpPost]
         [Route("api/[controller]/Doctor/Delete")]
         public async Task<IActionResult> DeleteDoctorAsync(int DoctorId)
         {
             var doctor = _DoctorRepository.GetById(DoctorId);
-           
+
             if (doctor == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            var bookings=_Context.Set<Booking>().Any(x=>x.DoctorId == DoctorId);
+            var bookings = _Context.Set<Booking>().Any(x => x.DoctorId == DoctorId);
 
-            if(bookings ==true)
+            if (bookings == true)
             {
                 return BadRequest("This doctor has bookings, and cannot be deleted");
             }
 
-            var appointments = _AppointmentRepository.FindAll(x=>x.DoctorId == DoctorId);
+            var appointments = _AppointmentRepository.FindAll(x => x.DoctorId == DoctorId);
             if (appointments != null)
             {
-                IEnumerable <AppointmentTime> appointmentTime = null;
+                IEnumerable<AppointmentTime> appointmentTime = null;
                 appointmentTime = _AppointmentTimeRepository.GetAll();
-               foreach (var appointment in appointments)
+                foreach (var appointment in appointments)
                 {
                     foreach (var time in appointmentTime)
                     {
-                        if(time.AppointmentId==appointment.Id)
+                        if (time.AppointmentId == appointment.Id)
                         {
                             _AppointmentTimeRepository.Delete(time);
                         }
                     }
-                    
-                        _AppointmentRepository.Delete(appointment);
+
+                    _AppointmentRepository.Delete(appointment);
                 }
             }
             var user = await _userManager.FindByEmailAsync(doctor.Email);
@@ -235,10 +233,9 @@ namespace Algoriza2.Api.Controllers
 
         [HttpGet]
         [Route("api/[controller]/Patients/GetAll")]
-        //Search is optional
-        public IActionResult GetAllPatients(int Page, int PageSize, string Search)
+        public IActionResult GetAllPatients(int PageNumber, int PageSize, string Search) //Search is optional
         {
-            var Patients = _PatientService.GetAllPatientsForAdmin(Page, PageSize, Search);
+            var Patients = _PatientService.GetAllPatientsForAdmin(PageNumber, PageSize, Search);
             return Ok(Patients);
         }
 
@@ -256,11 +253,16 @@ namespace Algoriza2.Api.Controllers
         [Route("api/[controller]/DiscountCodeCoupon/Add")]
         public IActionResult AddDiscountCodeCoupon(AddDiscountCodeCouponDTO discountCodeCouponModel)
         {
-
+            var discountCodeCouponName = discountCodeCouponModel.Code;
+            var checkingName=_Context.Set<DiscountCodeCoupon>().Any(x=>x.Code==discountCodeCouponName);
+            if(checkingName)
+            {
+                return BadRequest("There is another discount code coupon with the same name");
+            }
             DiscountCodeCoupon NewDiscountCodeCoupon = new DiscountCodeCoupon();
             NewDiscountCodeCoupon.Code = discountCodeCouponModel.Code;
             NewDiscountCodeCoupon.IsActive = discountCodeCouponModel.IsActive;
-            NewDiscountCodeCoupon.NumOfCompletedBookings = discountCodeCouponModel.NumOfCompletedBookings;
+            NewDiscountCodeCoupon.NumberOfCompletedBookings = discountCodeCouponModel.NumberOfCompletedBookings;
             NewDiscountCodeCoupon.DiscountType = discountCodeCouponModel.DiscountType;
             NewDiscountCodeCoupon.Value = discountCodeCouponModel.Value;
             _DiscountCodeCouponRepository.Add(NewDiscountCodeCoupon);
@@ -283,7 +285,7 @@ namespace Algoriza2.Api.Controllers
                 return BadRequest("Used discount code coupon can not be updated");
             }
             discountCodeCoupon.Code = discountCodeCouponModel.Code;
-            discountCodeCoupon.NumOfCompletedBookings = discountCodeCouponModel.NumOfCompletedBookings;
+            discountCodeCoupon.NumberOfCompletedBookings = discountCodeCouponModel.NumOfCompletedBookings;
             discountCodeCoupon.DiscountType = discountCodeCouponModel.DiscountType;
             discountCodeCoupon.Value = discountCodeCouponModel.Value;
             _Context.SaveChanges();
@@ -321,7 +323,5 @@ namespace Algoriza2.Api.Controllers
             _Context.SaveChanges();
             return Ok();
         }
-
-
     }
 }

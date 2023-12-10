@@ -15,7 +15,6 @@ namespace Algoriza2.Core.DTOs
         public string PhoneNumber { get; set; }
         public Gender Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
-
-        public IEnumerable<BookingInfoDTO> Bookings { get; set; } 
+        public IEnumerable<BookingInfoDTO> Bookings { get; set; }
     }
 }

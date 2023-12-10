@@ -10,20 +10,14 @@ namespace Algoriza2.Core.Interfaces
     public interface IBaseRepository<T> where T : class
     {
         T GetById(int id);
-        
         IEnumerable<T> GetAll();
         IEnumerable<T> GetAll(params Expression<Func<T, object>>[] includes);
         T Find(Expression<Func<T, bool>> match, string[] includes = null);
         IEnumerable<T> FindAll(Expression<Func<T, bool>> match, params Expression<Func<T, object>>[] includes);
-
-
-
         T Add(T entity);
         T Update(T entity);
-         void Delete(T entity);
+        void Delete(T entity);
         int Count();
-
-
     }
 
 

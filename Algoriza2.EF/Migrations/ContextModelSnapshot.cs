@@ -62,7 +62,7 @@ namespace Algoriza2.EF.Migrations
                     b.Property<int>("Day")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DoctorId")
+                    b.Property<int>("DoctorId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -79,7 +79,7 @@ namespace Algoriza2.EF.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AppointmentId")
+                    b.Property<int>("AppointmentId")
                         .HasColumnType("int");
 
                     b.Property<int>("FreeTime")
@@ -108,16 +108,16 @@ namespace Algoriza2.EF.Migrations
                     b.Property<int?>("DiscountCodeCouponId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DoctorId")
+                    b.Property<int>("DoctorId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("FinalPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("PatientId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("patientId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -129,7 +129,7 @@ namespace Algoriza2.EF.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.HasIndex("patientId");
+                    b.HasIndex("PatientId");
 
                     b.ToTable("Bookings");
                 });
@@ -150,7 +150,7 @@ namespace Algoriza2.EF.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("NumOfCompletedBookings")
+                    b.Property<int>("NumberOfCompletedBookings")
                         .HasColumnType("int");
 
                     b.Property<int>("Value")
@@ -433,7 +433,9 @@ namespace Algoriza2.EF.Migrations
                 {
                     b.HasOne("Algoriza2.Core.Models.Doctor", "Doctor")
                         .WithMany("Appointments")
-                        .HasForeignKey("DoctorId");
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Doctor");
                 });
@@ -442,7 +444,9 @@ namespace Algoriza2.EF.Migrations
                 {
                     b.HasOne("Algoriza2.Core.Models.Appointment", "Appointment")
                         .WithMany()
-                        .HasForeignKey("AppointmentId");
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Appointment");
                 });
@@ -461,11 +465,15 @@ namespace Algoriza2.EF.Migrations
 
                     b.HasOne("Algoriza2.Core.Models.Doctor", "Doctor")
                         .WithMany("Bookings")
-                        .HasForeignKey("DoctorId");
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Algoriza2.Core.Models.Patient", "patient")
+                    b.HasOne("Algoriza2.Core.Models.Patient", "Patient")
                         .WithMany()
-                        .HasForeignKey("patientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AppointmentTime");
 
@@ -473,7 +481,7 @@ namespace Algoriza2.EF.Migrations
 
                     b.Navigation("Doctor");
 
-                    b.Navigation("patient");
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

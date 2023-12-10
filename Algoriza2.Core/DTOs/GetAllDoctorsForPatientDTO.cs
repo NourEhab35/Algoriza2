@@ -11,15 +11,12 @@ namespace Algoriza2.Core.DTOs
     public class GetAllDoctorsForPatientDTO
     {
         public string FullName { get; set; }
-
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Specialization { set; get; }
         public int Price { get; set; }
         public Gender Gender { get; set; }
         public ICollection<Booking> Bookings { set; get; }
-        public ICollection<AppointmentTime> AppointmentTimes { set; get;}
-
-        
+        public ICollection<AppointmentTime> AppointmentTimes { set; get; }
     }
 }

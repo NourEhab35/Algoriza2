@@ -18,7 +18,7 @@ namespace Algoriza2.EF.Repositories
         private readonly BookingService _BookingService;
         private readonly Context _Context;
         public PatientService(IBaseRepository<Patient> PatientRepository, IBaseRepository<Booking> BookingRepository,
-            IBaseRepository<Doctor> DoctorRepository,BookingService BookingService , Context Context)
+            IBaseRepository<Doctor> DoctorRepository, BookingService BookingService, Context Context)
         {
             _PatientRepository = PatientRepository;
             _BookingRepository = BookingRepository;
@@ -27,9 +27,9 @@ namespace Algoriza2.EF.Repositories
             _Context = Context;
         }
 
-        public IEnumerable<GetAllPatientsForAdminDTO> GetAllPatientsForAdmin(int Page, int PageSize, string search)
+        public IEnumerable<GetAllPatientsForAdminDTO> GetAllPatientsForAdmin(int PageNumber, int PageSize, string search)
         {
-                var AllPatients = _Context.Set<Patient>().ToList();
+            var AllPatients = _Context.Set<Patient>().ToList();
 
             IEnumerable<Patient> SearchApplied = null;
             IEnumerable<GetAllPatientsForAdminDTO> PatientsPerPage = null;
@@ -51,7 +51,7 @@ namespace Algoriza2.EF.Repositories
                         DateOfBirth = x.DateOFBirth
 
                     }).ToList()
-                      .Skip((Page - 1) * PageSize)
+                      .Skip((PageNumber - 1) * PageSize)
                       .Take(PageSize).ToList();
 
             }
@@ -67,19 +67,19 @@ namespace Algoriza2.EF.Repositories
                         DateOfBirth = x.DateOFBirth
 
                     }).ToList()
-                      .Skip((Page - 1) * PageSize)
+                      .Skip((PageNumber - 1) * PageSize)
                       .Take(PageSize).ToList();
             }
             return PatientsPerPage;
         }
 
-        public GetPatientByIdForAdminDTO GetPatientByIdForAdmin (int patientId)
+        public GetPatientByIdForAdminDTO GetPatientByIdForAdmin(int patientId)
         {
 
             var bookings = _BookingService.GetAllBookingsForPatient(patientId).ToList();
-            var PatientById= _Context.Set<Patient>()
-                .Where(x=>x.Id == patientId)
-                .Select(x=> new GetPatientByIdForAdminDTO
+            var PatientById = _Context.Set<Patient>()
+                .Where(x => x.Id == patientId)
+                .Select(x => new GetPatientByIdForAdminDTO
                 {
                     FullName = $"{x.FirstName} {x.LastName}",
                     Email = x.Email,

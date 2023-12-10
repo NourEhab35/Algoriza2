@@ -11,11 +11,8 @@ namespace Algoriza2.Core.DTOs
     {
         public int Id { get; set; }
         public string Code { set; get; }
-
-       
         public int NumOfCompletedBookings { set; get; }
         public DiscountType DiscountType { set; get; }
-
         public int Value { get; set; }
     }
 }

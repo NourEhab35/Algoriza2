@@ -9,10 +9,8 @@ using static Algoriza2.Core.Enums;
 
 namespace Algoriza2.Core.Models
 {
-    public class Patient:ApplicationUser
+    public class Patient : ApplicationUser
     {
-     public ICollection<Booking> Bookings;
-
-
+        public ICollection<Booking> Bookings;
     }
 }

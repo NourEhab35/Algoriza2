@@ -10,11 +10,9 @@ namespace Algoriza2.Core.DTOs
     public class AddDiscountCodeCouponDTO
     {
         public string Code { set; get; }
-
         public bool IsActive { set; get; }
-        public int NumOfCompletedBookings { set; get; }
+        public int NumberOfCompletedBookings { set; get; }
         public DiscountType DiscountType { set; get; }
-
         public int Value { get; set; }
     }
 }

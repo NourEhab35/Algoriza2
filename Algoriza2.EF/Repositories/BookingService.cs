@@ -16,43 +16,43 @@ namespace Algoriza2.EF.Repositories
     {
         private readonly IBaseRepository<Booking> _BookingRepository;
         private readonly Context _context;
-        public BookingService(IBaseRepository<Booking> BookingRepository,Context context)
+        public BookingService(IBaseRepository<Booking> BookingRepository, Context context)
         {
             _BookingRepository = BookingRepository;
             _context = context;
         }
 
-        public int NumOfBookings()
+        public int NumberOfBookings()
         {
-            var NumOfTotalBookings = _BookingRepository.Count();
-            return NumOfTotalBookings;
+            var NumberOfTotalBookings = _BookingRepository.Count();
+            return NumberOfTotalBookings;
+        }
+        public int NumberOfPendingBookings()
+        {
+            var NumberOfPendingBookings = _BookingRepository.FindAll(x => x.Status == Enums.BookingStatus.Pending).Count();
+            return NumberOfPendingBookings;
+        }
+        public int NumberOfCompletedBookings()
+        {
+            var NumberOfCompletedBookings = _BookingRepository.FindAll(x => x.Status == Enums.BookingStatus.Completed).Count();
+            return NumberOfCompletedBookings;
+        }
+        public int NumberOfCanceledBookings()
+        {
+            var NumberOfCanceledBookings = _BookingRepository.FindAll(x => x.Status == Enums.BookingStatus.Canceled).Count();
+            return NumberOfCanceledBookings;
+        }
 
-        }
-        public int NumOfPendingBookings()
-        {
-            var NumOfPendingBookings = _BookingRepository.FindAll(x => x.Status == Enums.BookingStatus.Pending).Count();
-            return NumOfPendingBookings;
-        }
-        public int NumOfCompletedBookings()
-        {
-            var NumOfCompletedBookings = _BookingRepository.FindAll(x => x.Status == Enums.BookingStatus.Completed).Count();
-            return NumOfCompletedBookings;
-        }
-        public int NumOfCanceledBookings()
-        {
-            var NumOfCanceledBookings = _BookingRepository.FindAll(x => x.Status == Enums.BookingStatus.Canceled).Count();
-            return NumOfCanceledBookings;
-        }
-
-        public IEnumerable<BookingInfoDTO> GetAllBookingsForPatient(int PatientId) 
+        public IEnumerable<BookingInfoDTO> GetAllBookingsForPatient(int PatientId)
         {
             var bookingsForPatient = _context.Set<Booking>()
-                .Include(x=>x.Doctor)
-                .Include(x=>x.DiscountCodeCoupon)
-                .Include(x=>x.AppointmentTime)
-                .ThenInclude(x=>x.Appointment)
-                .Where(x=>x.PatientId == PatientId);
-            var selected = bookingsForPatient.Select(x => new BookingInfoDTO
+                .Include(x => x.Doctor)
+                .Include(x => x.DiscountCodeCoupon)
+                .Include(x => x.AppointmentTime)
+                .ThenInclude(x => x.Appointment)
+                .Where(x => x.PatientId == PatientId);
+
+            var selectedProperties = bookingsForPatient.Select(x => new BookingInfoDTO
             {
                 DoctorName = $"{x.Doctor.FirstName} {x.Doctor.LastName}",
                 Specialization = x.Doctor.Specialization,
@@ -64,30 +64,41 @@ namespace Algoriza2.EF.Repositories
                 BookingStatus = x.Status
 
             });
-            return selected;
+            return selectedProperties;
         }
 
         public IEnumerable<BookingInfoForDoctorDTO> GetAllBookingsForDoctor(int DoctorId)
         {
-            var bookingForDoctor = _context.Set<Booking>()
-                .Include(x => x.patient)
+            var bookingsForDoctor = _context.Set<Booking>()
+                .Include(x => x.Patient)
                 .Include(x => x.AppointmentTime)
                 .ThenInclude(x => x.Appointment)
                 .Where(x => x.DoctorId == DoctorId);
-            var selectedBookings = bookingForDoctor.Select(x => new BookingInfoForDoctorDTO
+                 
+            var selectedBookings = bookingsForDoctor.Select(x => new BookingInfoForDoctorDTO
             {
-                PatientName=$"{x.patient.FirstName} {x.patient.LastName}",
-                Gender=x.patient.Gender,
-                Phone = x.patient.PhoneNumber,
-                Email =x.patient.Email,
+                PatientName = $"{x.Patient.FirstName} {x.Patient.LastName}",
+                Gender = x.Patient.Gender,
+                Age=CalculateAge(x.Patient.DateOFBirth),
+                Phone = x.Patient.PhoneNumber,
+                Email = x.Patient.Email,
                 Day = x.AppointmentTime.Appointment.Day,
                 Time = x.AppointmentTime.FreeTime
             });
             return selectedBookings;
         }
+        public static int CalculateAge(DateTime dateOfBirth)
+        {
+            DateTime currentDate = new DateTime(2023, 12, 10);
+            int age = currentDate.Year - dateOfBirth.Year;
 
+            // Check if the birthday has occurred this year already
+            if (dateOfBirth.Date > currentDate.AddYears(-age))
+            {
+                age--;
+            }
 
-
-
+            return age;
+        }
     }
 }
